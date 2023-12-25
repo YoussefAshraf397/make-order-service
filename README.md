@@ -4,7 +4,7 @@
 
 ## Overview
 
-This repository contains the backend service for making order. The service is powered by Laravel Octane, PostgreSQL, and Redis, adhering to a Domain-Oriented Architecture inspired by Domain Oriented archticture.
+This repository contains the backend service for making order. The service is powered by Laravel Octane, PostgresSQL, and Redis, adhering to a Domain-Oriented Architecture inspired by Domain Oriented architecture.
 
 # Project Structure
 
@@ -50,7 +50,7 @@ src/
 ### 2. Database Interaction
 
 - **Description:**
-  PostgreSQL is the primary database for storing order and user information.
+  PostgresSQL is the primary database for storing order and user information.
 - **Technology:**
   Eloquent ORM for streamlined database interactions.
 
@@ -65,7 +65,7 @@ src/
 ## Technologies Used
 
 - **Laravel Octane:** Enhances performance with Swoole for efficient HTTP request handling.
-- **PostgreSQL:** A reliable and scalable relational database.
+- **PostgresSQL:** A reliable and scalable relational database.
 - **Redis:** Used for caching and Queueing.
 
 ## Getting Started
@@ -78,12 +78,28 @@ src/
    ```bash
    docker-compose up -d --build
    ```
-3. **Once the server is running, you can make a POST request to the following endpoint:**
+
+3. **Run terminal of foodics-app docker container:**
+   ```bash
+    docker exec -it foodics-app bash
+      ```
+
+4. **Run migration inside container:**
+   ```bash
+    php artisan migrate
+      ```
+
+5. **Run seeder to fill data inside container:**
+   ```bash
+    php artisan db:seed --class=Database\\Seeders\\FoodicsTaskSeeder
+      ```
+   
+6. **Once the server is running, you can make a POST request to the following endpoint:**
    ```bash
    http://localhost:8860/api/v1/ar/visitor/order/make-order
    ```
 
-4. **Request body:**
+7. **Request body:**
    ```bash
    {
     "products": [
