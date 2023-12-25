@@ -1,0 +1,43 @@
+on: [push, pull_request]
+
+name: CI
+jobs:
+  psalm:
+    runs-on: ubuntu-latest
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:8.1
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Install composer dependencies
+        working-directory: ./core
+
+        run: |
+          composer install --no-scripts --ignore-platform-req=ext-pcov
+
+      - name: Prepare Laravel Applications
+        working-directory: ./core
+
+        run: |
+          cp .env.ci .env
+          rm .env.testing
+          cp .env.ci .env.testing
+          php artisan key:generate
+          composer dump-autoload
+          php artisan jwt:secret
+
+      - name: check-style
+        working-directory: ./core
+
+        run:  composer check-style
+
+      - name: psalm
+        working-directory: ./core
+        run: ./vendor/bin/psalm --no-cache --php-version=8.1.1
+
+      - name: code sniffer
+        working-directory: ./core
+        run: vendor/bin/phpcs --standard=PSR12 src/ --ignore=Views --warning-severity=6

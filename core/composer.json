@@ -1,0 +1,110 @@
+{
+    "name": "laravel/laravel",
+    "type": "project",
+    "description": "Foddics API",
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "ext-gd": "*",
+        "astrotomic/laravel-translatable": "^11.1",
+        "chelout/laravel-relationship-events": "^1.5",
+        "edsdk/flmngr-server-php": "^1.0",
+        "fruitcake/laravel-cors": "^2.0",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "jenssegers/model": "^1.2",
+        "laravel/framework": "^9.0",
+        "laravel/helpers": "^1.2",
+        "laravel/octane": "^1.2",
+        "laravel/scout": "^9.4.9",
+        "laravel/tinker": "^2.0",
+        "laravel/ui": "^3.0",
+        "mcamara/laravel-localization": "^1.3.19",
+        "mstaack/laravel-postgis": "^6.1",
+        "predis/predis": "^1.1",
+        "psr/log": "^2.0",
+        "psr/simple-cache": "^3.0",
+        "spatie/data-transfer-object": "^3.7.3",
+        "spatie/fractalistic": "^2.8",
+        "spatie/laravel-backup": "^8.1.2",
+        "spatie/laravel-fractal": "^6.0.2",
+        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-query-builder": "^5.0.2",
+        "spatie/laravel-view-models": "^1.3",
+        "tymon/jwt-auth": "^1.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.8",
+        "beyondcode/laravel-dump-server": "^1.4",
+        "brianium/paratest": "^6.3",
+        "doctrine/dbal": "^2.10",
+        "filp/whoops": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.1",
+        "fzaninotto/faker": "^1.4",
+        "mockery/mockery": "^1.0",
+        "nunomaduro/collision": "^6.1",
+        "nunomaduro/larastan": "^0.7.12",
+        "phploc/phploc": "*",
+        "phpmd/phpmd": "^2.8",
+        "phpmetrics/phpmetrics": "^2.7",
+        "phpunit/phpunit": "^9.0",
+        "squizlabs/php_codesniffer": "^3.6",
+        "vimeo/psalm": "^4.21"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/App/",
+            "Domain\\": "src/Domain/",
+            "Support\\": "src/Support/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        },
+        "files": [
+            "tests/utilities/functions.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "check-style": "phpcs --standard=PSR12 src/ --ignore=Views src/ --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit  src tests",
+        "fix-style": "phpcbf --standard=PSR12 src/ --ignore=Views src/  --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit  src tests"
+    },
+    "repositories": {
+
+    }
+}

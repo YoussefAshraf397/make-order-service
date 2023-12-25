@@ -1,0 +1,72 @@
+version: '3.5'
+
+services:
+  foodics-app:
+    env_file: .env
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: foodics
+    volumes:
+      - ./core:/var/www
+    working_dir: /var/www
+    container_name: ${APP_CONTAINER_NAME}
+    ports:
+      - ${APP_NGINX_PORT}:9000
+    networks:
+      - foodics-service-app
+
+  postgresql-foodics:
+    env_file: .env
+    image: 'postgis/postgis:latest'
+    container_name: 'postgresql-foodics'
+    ports:
+      - "1113:5432"
+    environment:
+      POSTGRES_DB: task-db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - "./.docker-data/dbdata:/var/lib/postgresql/data"
+      - ".docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+      - ".docker/postgres/pg_hba.conf:/usr/share/postgresql/13/pg_hba.conf"
+    networks:
+      - foodics-service-app
+
+  postgresql-foodics-testing:
+    env_file: .env
+    image: 'postgis/postgis:latest'
+    container_name: ${UNIT_TEST_DB_CONTAINER_NAME}
+    ports:
+      - "1114:5432"
+    environment:
+      POSTGRES_DB: task-db-testing
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - "./.docker-data/dbdata:/var/lib/postgresql-foodics-testing"
+    networks:
+      - foodics-service-app
+
+  redis-foodics:
+    image: redis:alpine
+    container_name: ${REDIS_CONTAINER_NAME}
+    command: redis-server --appendonly yes --replica-read-only no
+    volumes:
+      - ./.docker-data/redis:/data
+    ports:
+      - "${REDIS_CONTAINER_PORT}:6379"
+    networks:
+      - foodics-service-app
+    healthcheck:
+      test: redis-cli -h redis -p 6379 ping
+      start_period: 3s
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+networks:
+  foodics-service-app:
+    name: ${FOODICS_NETWORK_NAME}
+    external: true
+    driver: bridge

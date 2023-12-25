@@ -1,0 +1,106 @@
+on: [ push, pull_request ]
+
+name: Test Coverage
+
+jobs:
+  Coverage:
+    runs-on: ubuntu-latest
+
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:8.1
+
+    services:
+      postgres:
+        image: postgis/postgis:13-3.1
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgresql-foodics-testing
+          options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 15.x
+
+      - name: Install packages
+        run: |
+          apt-get update
+          apt-get install -y poppler-utils
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          coverage: pcov
+          extensions: imagick
+
+      - name: Install dependencies
+        working-directory: ./core
+        run: composer install
+
+      - name: Prepare Laravel Applications
+        working-directory: ./core
+        run: |
+          cp .env.ci .env
+          rm .env.testing
+          cp .env.ci .env.testing
+          php artisan key:generate
+          php artisan jwt:secret
+          composer dump-autoload
+          php artisan config:cache
+
+      - name: Generate code coverage
+        working-directory: ./core
+        run: |
+          php artisan test --coverage-clover=coverage.xml 
+
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: postgres
+          DB_PORT: 5432
+          DB_DATABASE: postgresql-foodics-testing
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+
+
+      - name: Upload code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: ./core/coverage.xml
+
+      - name: Check test coverage
+        uses: johanvanhelden/gha-clover-test-coverage-check@v1
+        id: coverage
+        with:
+          percentage: "70"
+          filename: "./core/coverage.xml"
+          exit: "false"
+
+      - name: Generate the badge SVG image
+        run: echo  "image=https://img.shields.io/badge/coverage-${{ steps.coverage.outputs.coverage}}-${{ steps.coverage.outputs.coverage > 75 && 'green' || 'red' }}" >> $GITHUB_OUTPUT
+        id: badge
+
+      - name: Update Pull Request Description
+        run: |
+          # Fetch the current pull request description
+          DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
+                        jq -r '.body')
+          
+          # Add your desired text to the description
+          IMAGE_URL="${{ steps.badge.outputs.image }}"
+          NEW_DESCRIPTION="![Status](${IMAGE_URL})"
+          
+          # Update the pull request description using the GitHub API
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"${NEW_DESCRIPTION}\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"

@@ -72,7 +72,7 @@ src/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/your-repo.git
+   git clone git@github.com:YoussefAshraf397/make-order-service.git
 
 2. **Run via docker:**
    ```bash

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/testingAutoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">./src/Domain/*/Tests</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">./src/App/*/*/Tests</directory>
+        </testsuite>
+
+    </testsuites>
+
+    <coverage cacheDirectory=".phpunit.cache/code-coverage" processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/Support/</directory>
+            <directory suffix=".php">src/App/Homepage/</directory>
+            <directory suffix=".php">src/App/BaseApp/</directory>
+            <directory suffix="app.php">./src/App/*/*/Lang</directory>
+            <directory>./src/Domain/Models</directory>
+
+        </exclude>
+    </coverage>
+
+
+    <php>
+        <server name="APP_ENV" value="testing"/>
+        <server name="BCRYPT_ROUNDS" value="4"/>
+        <server name="CACHE_DRIVER" value="array"/>
+        <server name="MAIL_MAILER" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="SESSION_DRIVER" value="array"/>
+        <server name="TELESCOPE_ENABLED" value="false"/>
+    </php>
+</phpunit>
